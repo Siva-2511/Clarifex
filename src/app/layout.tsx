@@ -10,6 +10,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
   title: "Clarifex — Legal AI Assistant",
   description: "Clarity out of legal complexity. GenAI-powered legal document comprehension, risk scoring, obligation timeline, and contract diff.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   verification: {
     google: "clarifex-search-console-verification-token",
   },

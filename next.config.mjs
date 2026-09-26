@@ -33,7 +33,7 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https://*.googleusercontent.com https://avatars.githubusercontent.com https://maps.googleapis.com https://maps.gstatic.com",
       "connect-src 'self' https://openrouter.ai https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://fcmregistrations.googleapis.com https://*.algolia.net https://*.algolianet.com https://*.ingest.sentry.io https://vision.googleapis.com https://safebrowsing.googleapis.com https://translation.googleapis.com",
-      "frame-src 'self' https://docs.google.com https://www.google.com https://accounts.google.com",
+      "frame-src 'self' https://docs.google.com https://www.google.com https://accounts.google.com https://*.firebasedatabase.app https://*.firebaseio.com",
       "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'",

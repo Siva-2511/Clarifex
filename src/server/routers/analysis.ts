@@ -47,14 +47,20 @@ export const analysisRouter = router({
         },
       });
 
-      // Launch analysis asynchronously in background
-      runFullAnalysis({
-        analysisId: analysis.id,
-        userId: ctx.session.user.id as string,
-        documentIds: input.documentIds,
-        comprehensionLevel: input.comprehensionLevel,
-        jurisdiction: input.jurisdiction,
-      }).catch((err) => console.error("Async analysis runner error:", err));
+      // Trigger dedicated long-running API route (survives Vercel's 10s default limit)
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      fetch(`${baseUrl}/api/analysis/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          analysisId: analysis.id,
+          userId: ctx.session.user.id,
+          documentIds: input.documentIds,
+          comprehensionLevel: input.comprehensionLevel,
+          jurisdiction: input.jurisdiction,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      }).catch((err) => console.error("Failed to trigger analysis runner:", err));
 
       return { analysisId: analysis.id };
     }),
