@@ -11,7 +11,7 @@ describe("OpenRouter AI Fallback Chain", () => {
     delete process.env.OPENROUTER_API_KEY;
 
     const res = await callAI({ prompt: "Analyze contract" });
-    expect(res.modelUsed).toBe("google/gemini-flash-1.5");
+    expect(res.modelUsed).toBe("meta-llama/llama-3.1-8b-instruct:free");
     expect(res.text).toContain("summary");
     expect(res.text).toContain("riskScore");
 
@@ -26,8 +26,8 @@ describe("OpenRouter AI Fallback Chain", () => {
       callCount++;
       const body = JSON.parse(options.body);
 
-      // First model fails with 429
-      if (body.model === "google/gemini-flash-1.5") {
+      // First model (llama-3.1) fails with 429
+      if (body.model === "meta-llama/llama-3.1-8b-instruct:free") {
         return Promise.resolve({
           status: 429,
           ok: false,
@@ -35,7 +35,7 @@ describe("OpenRouter AI Fallback Chain", () => {
         });
       }
 
-      // Second model (llama-3.1) succeeds
+      // Second model (mistral-7b) succeeds
       return Promise.resolve({
         status: 200,
         ok: true,
@@ -48,7 +48,7 @@ describe("OpenRouter AI Fallback Chain", () => {
 
     const res = await callAI({ prompt: "Test prompt" });
     expect(callCount).toBe(2);
-    expect(res.modelUsed).toBe("meta-llama/llama-3.1-8b-instruct:free");
+    expect(res.modelUsed).toBe("mistralai/mistral-7b-instruct:free");
     expect(res.text).toBe("Fallback model analysis successful");
   });
 });

@@ -83,7 +83,7 @@ export async function callAI(params: AICallParams): Promise<AICallResult> {
           },
         ],
       }),
-      modelUsed: "google/gemini-flash-1.5",
+      modelUsed: "meta-llama/llama-3.1-8b-instruct:free",
     };
   }
 
