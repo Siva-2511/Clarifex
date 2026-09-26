@@ -97,6 +97,7 @@ export default function RegisterPage() {
                   <Input
                     id="name"
                     type="text"
+                    autoComplete="name"
                     placeholder="Alex Vance"
                     required
                     value={name}
@@ -113,6 +114,7 @@ export default function RegisterPage() {
                   <Input
                     id="email"
                     type="email"
+                    autoComplete="email"
                     placeholder="alex@example.com"
                     required
                     value={email}
@@ -129,6 +131,7 @@ export default function RegisterPage() {
                   <Input
                     id="password"
                     type="password"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     required
                     value={password}
