@@ -32,11 +32,18 @@ export default function AnalysisWorkspacePage() {
 
   const [activeTab, setActiveTab] = useState("summary");
 
-  const { data: analysis, isLoading, error } = (trpc.analysis.getById.useQuery as any)({
-    id: analysisId,
-  });
+  const { data: analysis, isLoading, error } = (trpc.analysis.getById.useQuery as any)(
+    { id: analysisId },
+    {
+      refetchInterval: (data: any) =>
+        data?.status === "processing" || data?.status === "pending" ? 2500 : false,
+    },
+  );
 
-  if (isLoading) {
+  const isStillProcessing =
+    isLoading || analysis?.status === "processing" || analysis?.status === "pending";
+
+  if (isStillProcessing) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-violet-500" />

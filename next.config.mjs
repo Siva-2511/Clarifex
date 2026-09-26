@@ -28,11 +28,11 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://identitytoolkit.googleapis.com",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://identitytoolkit.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https://*.googleusercontent.com https://avatars.githubusercontent.com https://maps.googleapis.com https://maps.gstatic.com",
-      "connect-src 'self' https://openrouter.ai https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://fcmregistrations.googleapis.com https://*.algolia.net https://*.algolianet.com https://*.ingest.sentry.io https://vision.googleapis.com https://safebrowsing.googleapis.com https://translation.googleapis.com",
+      "connect-src 'self' https://openrouter.ai https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://fcmregistrations.googleapis.com https://*.algolia.net https://*.algolianet.com https://*.ingest.sentry.io https://vision.googleapis.com https://safebrowsing.googleapis.com https://translation.googleapis.com",
       "frame-src 'self' https://docs.google.com https://www.google.com https://accounts.google.com",
       "frame-ancestors 'none'",
       "object-src 'none'",

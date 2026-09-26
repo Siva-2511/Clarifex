@@ -22,13 +22,15 @@ export function usePresence(analysisId: string, currentUser?: { id: string; name
       const presenceRef = ref(rtdb, `presence/${analysisId}/${currentUser.id}`);
       const allPresenceRef = ref(rtdb, `presence/${analysisId}`);
 
-      const myData: Collaborator = {
+      const myData: Record<string, any> = {
         userId: currentUser.id,
         name: currentUser.name || "Anonymous Collaborator",
         email: currentUser.email || "",
-        image: currentUser.image || undefined,
         joinedAt: Date.now(),
       };
+      if (currentUser.image) {
+        myData.image = currentUser.image;
+      }
 
       // Set user presence
       set(presenceRef, myData);
