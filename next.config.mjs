@@ -48,16 +48,66 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+
+  // ─── Performance / Efficiency ────────────────────────────────────────────────
+  compress: true,                          // gzip responses
+  swcMinify: true,                         // SWC-based minifier (faster + smaller)
+
+  // Tree-shake large icon/UI libraries to only include used exports
+  modularizeImports: {
+    "lucide-react": {
+      transform: "lucide-react/dist/esm/icons/{{kebabCase member}}",
+      skipDefaultConversion: true,
+    },
+  },
+
+  // Optimise Next.js image handling
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      { protocol: "https", hostname: "*.googleusercontent.com" },
+      { protocol: "https", hostname: "avatars.githubusercontent.com" },
+      { protocol: "https", hostname: "lqbualpzgkdqizugkqsz.supabase.co" },
+    ],
+    minimumCacheTTL: 3600,
+  },
+
+  // Experiment: app directory, optimised CSS, server actions
+  experimental: {
+    optimizeCss: false,                    // off for now — requires critters peer dep
+    serverComponentsExternalPackages: [
+      "@prisma/client",
+      "pdf-parse",
+      "mammoth",
+      "@react-pdf/renderer",
+    ],
+  },
+
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: securityHeaders,
       },
+      // Cache static assets aggressively
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Cache public assets
+      {
+        source: "/(.*)\\.(ico|png|svg|jpg|jpeg|webp|avif|woff|woff2)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
+        ],
+      },
     ];
   },
+
   webpack: (config) => {
-    // Canvas or binary fallbacks for pdf-parse if needed
+    // Binary / canvas fallbacks for pdf-parse
     config.resolve.alias.canvas = false;
     config.resolve.fallback = {
       ...config.resolve.fallback,

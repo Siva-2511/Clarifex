@@ -1,154 +1,207 @@
-# Clarifex — Legal AI Assistant
+# Clarifex — AI Legal Document Intelligence Platform
 
-> **"Clarity out of legal complexity"**  
-> A production-grade, GenAI-powered legal assistant that makes legal documents, contracts, policies, and agreements accessible and actionable for everyday users — without replacing professional legal counsel.
+> **AI for Legal Assistance & Access** · Built for the Hack2Skill AI Innovation Challenge
 
-[![CI](https://github.com/clarifex/clarifex/actions/workflows/ci.yml/badge.svg)](https://github.com/clarifex/clarifex/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](https://opensource.org/licenses/MIT)
-[![Next.js](https://img.shields.io/badge/Next.js-14_App_Router-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)](https://www.typescriptlang.org/)
-[![WCAG](https://img.shields.io/badge/WCAG-2.1_AA-emerald)](https://www.w3.org/WAI/standards-guidelines/wcag/)
-
----
-
-## Top-Level Overview
-
-- **Project name:** Clarifex
-- **Tagline:** Clarity out of legal complexity
-- **Submission:** IBM Hack2Skill Hackathon — Legal AI Vertical
-- **Primary host:** Vercel (Edge & Serverless Runtime)
-- **AI Gateway:** OpenRouter API (Gemini 1.5 Flash → Llama 3.1 → Mistral → DeepSeek fallback chain)
-
-### What Makes Clarifex Different
-
-Most submissions follow the basic pattern: *upload → extract → summarise → export*.  
-Clarifex is designed around an **intelligent conversation and analysis layer** that understands context across multiple documents, adapts to different comprehension levels, and provides novel capabilities:
-
-1. **ELI-5 / ELI-10 / Expert Mode:** Rewrites the entire contract analysis dynamically for any comprehension level — from playground metaphors to formal legal memorandums.
-2. **Screenshot OCR:** Uses Google Cloud Vision OCR for copy-protected legal pages that block text selection or scraping.
-3. **Clause DNA Fingerprint:** Computes structural cryptographic hashes (SHA-256) and token-based similarity to identify standard boilerplate and cross-contract duplication.
-4. **Risk Heat-Map:** Animated color-coded danger scoring per clause (green/amber/red) with detailed rationale and Recharts distribution visualization.
-5. **Obligation Timeline:** Chronological timeline of extracted deadlines, auto-renewal windows, and notice requirements with one-click Google Calendar sync.
-6. **Multi-Document Comparison Matrix:** Compares 3 to 5 contracts simultaneously in a structured pivot-table view.
-7. **6 Ingestion Channels:** File upload (PDF/DOCX/TXT), plain-text paste, SSRF-guarded URL fetch, Google Drive import, screenshot OCR, and multi-file batch queue.
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen)](#)
+[![Tests](https://img.shields.io/badge/tests-25%2F25-brightgreen)](#testing)
 
 ---
 
-## 18 Google & Firebase Services Integration
+## 🎯 Problem Statement
 
-Clarifex deeply integrates 18 distinct Google and Firebase services across its workflow:
-
-| # | Google / Firebase Service | Code Location | Purpose in Clarifex |
-|---|---|---|---|
-| 1 | **Google OAuth 2.0** | `src/auth.ts` | One-click social sign-in with profile synchronization |
-| 2 | **Google reCAPTCHA v3** | `src/app/(auth)/login/page.tsx` | Invisible bot protection against credential stuffing and brute force |
-| 3 | **Google Cloud Vision API** | `src/lib/ingestion/ocrProcessor.ts` | High-accuracy OCR on copy-protected screenshots |
-| 4 | **Google Analytics 4 (GA4)** | `src/app/layout.tsx` | User behavior, page view, and feature engagement metrics |
-| 5 | **Google Translate API** | `src/lib/google/translate.ts` | In-place multilingual translation of analysis summaries |
-| 6 | **Google Maps Embed API** | `src/components/analysis/JurisdictionSelector.tsx` | Visual jurisdiction selection widget with statutory context |
-| 7 | **Google Fonts (Geist + Inter)** | `src/app/layout.tsx` | Zero-CLS typography self-hosted via `next/font` |
-| 8 | **Google Safe Browsing API** | `src/lib/ingestion/urlFetcher.ts` | Pre-fetch URL safety check against phishing and malware |
-| 9 | **Google PageSpeed Insights** | `.lighthouserc.json` | Automated performance and accessibility compliance in CI |
-| 10 | **Google Calendar API** | `src/lib/google/calendar.ts` | One-click calendar sync for extracted contract obligations |
-| 11 | **Google Drive Picker API** | `src/components/ingestion/tabs/DriveTab.tsx` | Direct document import from Google Drive storage |
-| 12 | **Google Docs Viewer Embed** | `src/components/ingestion/DocsViewer.tsx` | Inline document preview for imported Drive agreements |
-| 13 | **Firebase Realtime Database** | `src/lib/firebase/presence.ts` | Live collaborator presence avatars and multi-user viewing |
-| 14 | **Firebase Cloud Messaging (FCM)** | `src/lib/firebase/fcm.ts`, `public/firebase-messaging-sw.js` | Desktop and background push notifications for analysis completion |
-| 15 | **Google Search Console** | `src/app/layout.tsx` | Search index verification meta tag |
-| 16 | **Google Tag Manager** | `src/lib/google/gtm.ts` | Custom analytics event tracking for upload, analysis, and exports |
-| 17 | **Gmail API** | `src/lib/google/gmail.ts` | Direct email delivery of generated PDF reports via user Gmail |
-| 18 | **Gemini 1.5 Flash via OpenRouter** | `src/lib/ai/models.ts` | Primary AI model delivering sub-second legal reasoning |
+Access to legal expertise is inequitable. Complex legal documents — NDAs, employment contracts, leases, service agreements — are routinely signed without comprehension by individuals who cannot afford legal counsel. Clarifex bridges this gap using **Generative AI** to democratise legal document understanding.
 
 ---
 
-## Full Technology Stack
+## 🧠 Generative AI Services Utilised
 
-| Layer | Technology | Role |
-|---|---|---|
-| **Frontend Framework** | Next.js 14 (App Router) | Server components, edge routing, streaming SSR |
-| **Language & Typing** | TypeScript 5 (Strict Mode) | End-to-end type safety |
-| **Styling & Design System** | Tailwind CSS + shadcn/ui | Tokens: Deep Navy `#0f172a`, Electric Violet `#7c3aed`, Emerald `#10b981` |
-| **Animations** | Framer Motion | Smooth accordion expansions, tab transitions, particle canvas |
-| **Type-Safe API** | tRPC v10/v11 + Zod | Type-safe RPC with client React Query hooks |
-| **Database & ORM** | Neon PostgreSQL + Prisma ORM | Relational models with indexes on high-query foreign keys |
-| **Document Storage** | Cloudflare R2 | S3-compatible private bucket with signed URLs |
-| **Rate Limiting** | Upstash Redis | Sliding-window limiter (5 attempts / 15 mins / IP) |
-| **Authentication** | NextAuth.js v5 | Google, GitHub, Credentials (bcryptjs), TOTP MFA |
-| **Report Generation** | `@react-pdf/renderer` + `docx` | Formatted PDF memos and DOCX executive summaries |
-| **Diff Viewer** | `react-diff-viewer-continued` | Side-by-side and unified redline diff with semantic badges |
-| **Testing** | Vitest + Playwright + axe-core | Automated unit tests and accessibility audits |
-
----
-
-## Security Architecture & OWASP Top 10
-
-All mitigations are enforced across every route and component:
-
-- **SQL Injection:** Exclusively parameterized queries through Prisma ORM.
-- **SSRF Prevention:** Private IP blocking (`10.x`, `172.16-31.x`, `192.168.x`, `127.x`, `169.254.x.x`, `::1`), internal hostname prohibition, and Google Safe Browsing verification.
-- **Brute Force Defense:** Sliding-window rate limiting on all authentication and API endpoints.
-- **XSS & Content Injection:** React escaping, DOMPurify sanitization, and strict Content-Security-Policy headers in `next.config.mjs`.
-- **File Validation:** Magic-byte inspection for PDF (`%PDF-`), DOCX (`PK\x03\x04`), and images, rejecting spoofed MIME extensions.
-- **Access Control:** All procedures verify session credentials and scope database queries strictly to `ctx.session.user.id`.
+| Service | Where Used |
+|---|---|
+| **Google Gemini Flash 1.5** (via OpenRouter) | Primary AI engine for clause analysis, risk scoring, ELI summaries |
+| **Anthropic Claude 3 Haiku** (via OpenRouter) | Fallback model with automatic failover on rate limits |
+| **Google Cloud Vision API** | OCR — extracts text from scanned legal document images |
+| **Google Cloud Translate API** | Real-time multilingual translation of analysis results |
+| **Google Cloud Natural Language** | Entity extraction for obligation timeline detection |
+| **Firebase Realtime Database** | Live collaboration presence (who's viewing which clause) |
+| **Firebase Cloud Messaging (FCM V1)** | Push notifications for analysis completion |
+| **Google reCAPTCHA v3** | Invisible bot protection on all auth forms |
+| **Google Calendar API** | Export obligation deadlines as calendar events |
+| **Gmail API** | Send analysis reports directly to collaborators |
+| **Google Drive API** | Import documents directly from Google Drive |
+| **Algolia AI Search** | Full-text semantic search across document vault |
 
 ---
 
-## Local Development Setup
+## ✨ Key Features
 
-### Prerequisites
-- Node.js >= 20.0.0 (Node 22 recommended)
-- pnpm >= 9.0.0
+### 🔍 Core AI Analysis
+- **Risk Heat Map** — Colour-coded clause-level risk scoring (Critical / High / Medium / Low)
+- **Clause DNA Fingerprinting** — Detect copied or similar clauses across document versions
+- **Obligation Timeline** — Auto-extract deadlines and duties into a Gantt-style timeline
+- **AI Chat** — Ask natural language questions about any clause
+- **Multi-doc Matrix** — Compare up to 5 contracts side-by-side with AI-powered diff
 
-### Installation
+### 📖 ELI (Explain Like I Am) Modes
+| Mode | Audience |
+|---|---|
+| **ELI-5** | Children — metaphor-based explanations |
+| **ELI-10** | General public — plain English |
+| **Expert** | Lawyers — doctrine, case law, jurisdiction |
 
-1. Clone repository and install dependencies:
-   ```bash
-   pnpm install
-   ```
+### 📄 Document Ingestion (6 Methods)
+- **File Upload** (PDF, DOCX, TXT) with virus-check validation
+- **Screenshot / Camera** with Google Cloud Vision OCR
+- **URL Import** with SSRF-protected content fetching
+- **Google Drive** direct import
+- **Paste Text** for raw clause input
+- **Batch Upload** for bulk contract analysis
 
-2. Copy the environment variables template:
-   ```bash
-   cp .env.example .env.local
-   ```
+### 🔒 Security & Privacy
+- Bcrypt password hashing + TOTP MFA (authenticator app)
+- Upstash Redis rate limiting (per-IP and per-user)
+- Row-level security on Supabase Storage (signed URLs)
+- CSRF protection via NextAuth.js
+- Full audit trail for all sensitive actions
 
-3. Generate Prisma client:
-   ```bash
-   pnpm run postinstall
-   ```
-
-4. Run unit tests:
-   ```bash
-   pnpm test
-   ```
-
-5. Start the development server:
-   ```bash
-   pnpm dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) to view Clarifex.
-
----
-
-## Verification & Testing Commands
-
-- **Unit Tests (Vitest):**
-  ```bash
-  pnpm test
-  ```
-  Runs tests for OpenRouter fallback chain, fileValidator magic bytes, SSRF guard, rate limiter, and auth tokens.
-
-- **Type Checking:**
-  ```bash
-  pnpm run typecheck
-  ```
-
-- **Production Build:**
-  ```bash
-  pnpm run build
-  ```
+### 📤 Export & Collaboration
+- Export to **PDF**, **DOCX**, **Markdown**
+- Send via **Gmail API**
+- Real-time **presence avatars** (Firebase RTDB)
+- **Share & invite** collaborators with granular access
 
 ---
 
-## Disclaimer
+## 🏗 Architecture
 
-Clarifex provides automated AI analysis for informational purposes only. It is not a law firm and does not provide formal legal advice or representation. Users should always consult a licensed attorney for formal legal matters.
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Next.js 14 App Router                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐  │
+│  │ (auth)/  │  │(marketing│  │   /dashboard/*        │  │
+│  │ login    │  │  )/      │  │   ├─ /upload          │  │
+│  │ register │  │ landing  │  │   ├─ /vault           │  │
+│  │ mfa      │  │ /privacy │  │   ├─ /analyse/[id]    │  │
+│  └──────────┘  │ /terms   │  │   ├─ /compare         │  │
+│                └──────────┘  │   ├─ /timeline        │  │
+│                              │   └─ /settings        │  │
+│                              └──────────────────────┘  │
+├──────────────┬──────────────┬───────────────────────────┤
+│  tRPC v10    │  NextAuth.js │  Middleware (edge)        │
+│  API Layer   │  JWT sessions│  Rate limiting + auth     │
+├──────────────┴──────────────┴───────────────────────────┤
+│           External Services                              │
+│  Neon PostgreSQL │ Supabase Storage │ Upstash Redis      │
+│  OpenRouter AI   │ Firebase         │ Algolia Search     │
+│  Resend Email    │ Google APIs      │ Sentry Monitoring  │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone
+git clone https://github.com/Siva-2511/Clarifex.git
+cd Clarifex
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Configure environment
+cp .env.example .env.local
+# Fill in your API keys (see .env.example for full list)
+
+# 4. Push database schema
+npx prisma db push
+
+# 5. Start development server
+pnpm dev
+# → http://localhost:3000
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+pnpm test        # Run all unit tests
+pnpm test:watch  # Watch mode
+```
+
+**25 tests across 7 suites:**
+- `fileValidator` — MIME type and size validation
+- `urlFetcher` — SSRF protection
+- `tokens` — JWT generation and verification
+- `openrouter` — AI model fallback chain
+- `rateLimit` — Per-IP rate limiting
+- `documentUtils` — Text processing and risk scoring
+- `a11y` — Accessibility utility helpers
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/          # Login, Register, MFA, Password Reset
+│   ├── (marketing)/     # Landing page, Privacy, Terms
+│   ├── dashboard/       # All protected app routes
+│   └── api/             # REST endpoints + tRPC handler
+├── components/
+│   ├── analysis/        # RiskHeatMap, ClauseFingerprint, ChatPanel, ELI Toggle…
+│   ├── ingestion/       # 6-method document upload tabs
+│   ├── collaboration/   # Presence avatars, Share modal
+│   └── ui/              # Shadcn/ui primitives + ErrorBoundary
+├── lib/
+│   ├── ai/              # OpenRouter client, prompts, analysis runner
+│   ├── auth/            # Password, MFA, tokens
+│   ├── google/          # Calendar, Gmail, Translate, GTM
+│   ├── ingestion/       # OCR, URL fetcher, Drive import
+│   ├── export/          # PDF, DOCX, Markdown
+│   └── storage/         # Supabase Storage adapter
+└── server/
+    └── routers/         # tRPC routers: analysis, document, auth, notification
+```
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript 5 |
+| API Layer | tRPC v10 + React Query v4 |
+| Auth | NextAuth.js v5 (Google, GitHub, Credentials, MFA) |
+| Database | Neon PostgreSQL + Prisma ORM |
+| File Storage | Supabase Storage |
+| Cache / Rate Limit | Upstash Redis |
+| AI | OpenRouter (Gemini, Claude, Llama fallback chain) |
+| Search | Algolia |
+| Email | Resend |
+| Monitoring | Sentry |
+| Realtime | Firebase RTDB + FCM |
+| Styling | Tailwind CSS + Shadcn/ui |
+| Testing | Vitest |
+
+---
+
+## 📜 Legal Pages
+
+- [Privacy Policy](http://localhost:3000/privacy)
+- [Terms of Service](http://localhost:3000/terms)
+
+---
+
+## 👤 Author
+
+**Sivasubramaniyan G** — [sivasubramaniyan.g2511@gmail.com](mailto:sivasubramaniyan.g2511@gmail.com)
+
+---
+
+*Clarifex — Stop signing in the dark.*
