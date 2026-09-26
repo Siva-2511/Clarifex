@@ -298,6 +298,29 @@ export default function MarketingPage() {
           </Button>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t bg-card/40 py-10 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 font-bold text-foreground">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white">
+              <Scale className="h-3.5 w-3.5" />
+            </div>
+            CLARIFEX
+          </div>
+          <p className="text-xs text-center">
+            AI-powered legal document analysis. For informational purposes only — not legal advice.
+          </p>
+          <nav className="flex items-center gap-5 text-xs">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <a href="mailto:sivasubramaniyan.g2511@gmail.com" className="hover:text-foreground transition-colors">Contact</a>
+          </nav>
+        </div>
+        <p className="text-center text-xs text-muted-foreground/60 mt-6">
+          © {new Date().getFullYear()} Clarifex. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 }

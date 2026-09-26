@@ -1,71 +1,97 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
-const accountId = process.env.CLOUDFLARE_R2_ACCOUNT_ID || "dummy-account-id";
-const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || "dummy-access-key";
-const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || "dummy-secret-key";
-const bucketName = process.env.CLOUDFLARE_R2_BUCKET_NAME || "clarifex-documents";
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const bucketName = process.env.SUPABASE_STORAGE_BUCKET || "clarifex-documents";
 
-export const r2Client = new S3Client({
-  region: "auto",
-  endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId,
-    secretAccessKey,
-  },
+// Server-side admin client (never exposed to browser)
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { persistSession: false },
 });
 
 /**
- * Generates a pre-signed PUT URL for secure, direct document upload
+ * Ensures the storage bucket exists (idempotent)
  */
-export async function getPresignedUploadUrl(
-  userId: string,
-  fileName: string,
-  contentType: string,
-  expiresIn = 3600,
-): Promise<{ uploadUrl: string; storageKey: string }> {
-  const fileExt = fileName.includes(".") ? fileName.split(".").pop() : "bin";
-  const storageKey = `users/${userId}/${crypto.randomUUID()}.${fileExt}`;
-
-  const command = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: storageKey,
-    ContentType: contentType,
-  });
-
-  const uploadUrl = await getSignedUrl(r2Client, command, { expiresIn });
-  return { uploadUrl, storageKey };
+async function ensureBucket() {
+  const { data: buckets } = await supabase.storage.listBuckets();
+  const exists = buckets?.some((b) => b.name === bucketName);
+  if (!exists) {
+    await supabase.storage.createBucket(bucketName, { public: false });
+  }
 }
 
 /**
- * Generates a pre-signed GET URL for viewing or downloading documents
+ * Upload a file buffer to Supabase Storage.
+ * Returns the storage path (key) for later retrieval.
+ */
+export async function uploadToStorage(
+  userId: string,
+  fileName: string,
+  buffer: Buffer,
+  contentType: string,
+): Promise<{ storageKey: string }> {
+  await ensureBucket();
+
+  const fileExt = fileName.includes(".") ? fileName.split(".").pop() : "bin";
+  const storageKey = `users/${userId}/${crypto.randomUUID()}.${fileExt}`;
+
+  const { error } = await supabase.storage
+    .from(bucketName)
+    .upload(storageKey, buffer, { contentType, upsert: false });
+
+  if (error) throw new Error(`Storage upload failed: ${error.message}`);
+
+  return { storageKey };
+}
+
+/**
+ * Returns a time-limited signed URL for downloading a stored file.
  */
 export async function getPresignedDownloadUrl(
   storageKey: string,
   expiresIn = 3600,
 ): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: bucketName,
-    Key: storageKey,
-  });
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .createSignedUrl(storageKey, expiresIn);
 
-  return getSignedUrl(r2Client, command, { expiresIn });
+  if (error || !data?.signedUrl) {
+    throw new Error(`Failed to create signed URL: ${error?.message}`);
+  }
+
+  return data.signedUrl;
 }
 
 /**
- * Deletes an object from Cloudflare R2
+ * Returns a signed upload URL so the browser can upload directly to Supabase.
+ */
+export async function getPresignedUploadUrl(
+  userId: string,
+  fileName: string,
+  _contentType: string,
+  expiresIn = 3600,
+): Promise<{ uploadUrl: string; storageKey: string }> {
+  await ensureBucket();
+
+  const fileExt = fileName.includes(".") ? fileName.split(".").pop() : "bin";
+  const storageKey = `users/${userId}/${crypto.randomUUID()}.${fileExt}`;
+
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .createSignedUploadUrl(storageKey);
+
+  if (error || !data?.signedUrl) {
+    throw new Error(`Failed to create signed upload URL: ${error?.message}`);
+  }
+
+  return { uploadUrl: data.signedUrl, storageKey };
+}
+
+/**
+ * Deletes an object from Supabase Storage.
  */
 export async function deleteStorageObject(storageKey: string): Promise<void> {
-  const command = new DeleteObjectCommand({
-    Bucket: bucketName,
-    Key: storageKey,
-  });
-
-  await r2Client.send(command);
+  const { error } = await supabase.storage.from(bucketName).remove([storageKey]);
+  if (error) throw new Error(`Storage delete failed: ${error.message}`);
 }
